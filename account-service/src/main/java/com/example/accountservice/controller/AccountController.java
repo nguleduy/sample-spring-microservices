@@ -1,8 +1,11 @@
 package com.example.accountservice.controller;
 
+import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.model.Account;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -28,21 +31,60 @@ public class AccountController {
     accounts.add(new Account(7, 2, "777777"));
   }
 
-  @RequestMapping("/accounts/{number}")
-  public Account findByNumber(@PathVariable("number") String number) {
+  @RequestMapping(method = RequestMethod.GET, value = "/number/{number}")
+  public Account findByNumber(@PathVariable("number") String number) throws AccountNotFoundException {
     logger.info(String.format("Account.findByNumber(%s)", number));
-    return accounts.stream().filter(it -> it.getNumber().equals(number)).findFirst().get();
+    return accounts.stream()
+            .filter(it -> it.getNumber().equals(number))
+            .findFirst()
+            .orElseThrow(() -> new AccountNotFoundException("number : " + number));
   }
 
-  @RequestMapping("/accounts/customer/{customer}")
+  @RequestMapping(method = RequestMethod.GET, value = "/customer/{customer}")
   public List<Account> findByCustomer(@PathVariable("customer") Integer customerId) {
     logger.info(String.format("Account.findByCustomer(%s)", customerId));
-    return accounts.stream().filter(it -> it.getCustomerId().intValue() == customerId.intValue()).collect(Collectors.toList());
+    return accounts.stream()
+            .filter(it -> it.getCustomerId().intValue() == customerId.intValue())
+            .collect(Collectors.toList());
   }
 
-  @RequestMapping("/accounts")
+  @RequestMapping(method = RequestMethod.GET, value = "")
   public List<Account> findAll() {
     logger.info("Account.findAll()");
     return accounts;
   }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/{id}")
+  public Account findById(@PathVariable Integer id) throws AccountNotFoundException {
+    logger.info("Account.findAll()");
+    return accounts.stream()
+            .filter(it -> it.getId().equals(id))
+            .findFirst()
+            .orElseThrow(() -> new AccountNotFoundException("id : " + id));
+  }
+
+  @RequestMapping(method = RequestMethod.POST, value = "")
+  public Account createNewAccount(@RequestBody Account account) {
+    logger.info("Account.createNewAccount()");
+    if (account.getId() != null) {
+      return null;
+    }
+    int size = accounts.size();
+    account.setId(size + 1);
+    accounts.add(account);
+    return account;
+  }
+
+  @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+  public boolean deleteAccount(@PathVariable Integer id) {
+    logger.info("Account.deleteAccount()");
+    try {
+      Account byId = findById(id);
+      accounts.remove(byId);
+    } catch (AccountNotFoundException e) {
+      return false;
+    }
+    return true;
+  }
+
 }
