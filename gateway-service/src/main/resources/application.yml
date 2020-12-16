@@ -1,5 +1,5 @@
 info:
-  component: Edge Server
+  component: Gateway Service
 
 endpoints:
   restart:
