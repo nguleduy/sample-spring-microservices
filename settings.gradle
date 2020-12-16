@@ -1,0 +1,6 @@
+rootProject.name = 'sample-spring-microservice'
+include ':account-service'
+include ':customer-service'
+include ':discovery-service'
+include ':gateway-service'
+include ':zipkin-service'
