@@ -1,5 +1,5 @@
 FROM openjdk
 MAINTAINER Joseph <nguleduy@gmail.com>
-ADD eureka-1.2-SNAPSHOT.jar eureka.jar
-ENTRYPOINT ["java", "-jar", "/eureka.jar"]
+ADD discovery-service-1.0-SNAPSHOT.jar discovery-service.jar
+ENTRYPOINT ["java", "-jar", "/discovery-service.jar"]
 EXPOSE 8761
